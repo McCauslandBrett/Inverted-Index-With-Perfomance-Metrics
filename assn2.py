@@ -18,9 +18,6 @@ import math
 import glob
 import errno
 import os
-from nltk.stem import PorterStemmer
-from nltk.tokenize import sent_tokenize, word_tokenize
-
 
 import sqlite3
 import numpy as np
@@ -31,11 +28,18 @@ import operator
 from operator import itemgetter, attrgetter
 from sklearn.preprocessing import Imputer
 from sklearn.cross_validation import train_test_split
+import bs4 as bs
+import urllib.request
 
 import pandas as pd
 from collections import namedtuple
 import pandas as pd
 
+from nltk.stem import PorterStemmer
+from nltk.tokenize import sent_tokenize, word_tokenize
+# Assnment 2
+from bs4  import BeautifulSoup
+ps = PorterStemmer()
 
 class term:
     def __init__(self,numdocs,postings):
@@ -80,20 +84,23 @@ def load_stops(stopwords,path):
  files = glob.glob(spath)
  for fname in files:
      with open(fname) as f: #file
-         cnt = 0
          for line in f:
-             line_process(line.strip().split(' '), stopwords)
-             cnt += 1
+             load_line(line.strip().split(' '), stopwords)
 
-def line_process(line, stopwords):
-   for word in line:
+
+def load_line(l_line, stopwords):
+   for word in l_line:
        stopwords.insert(0,word.lower())
 
-# dict_term={term,#docs,postings{fname,docFreq}}
 
-def word_count(line, dict_terms,dict_docs,fname):
+# makes all word in line lowercase
+# implements stemming
+# Updates word count in fname for every word
+#
+def line_proc(line, dict_terms,dict_docs,fname,stopwords):
    for word in line:
        w=word.lower()
+       w=ps.stem(w)
        if w not in stopwords:
            dict_docs[fname] += 1
            if w in dict_terms:
@@ -108,22 +115,33 @@ def word_count(line, dict_terms,dict_docs,fname):
                t =term(1,postings)
                dict_terms[w] = t
 
-def loadWcountWDoc(dict_terms,dict_docs,path):
- spath = path + "/*.txt"
- files = glob.glob(spath)
- for fname in files:
-     filename=fname[5:]
-     dict_docs[filename] = 0
-     with open(fname) as f: #file
-         for line in f:
-             word_count(line.strip().split(' '),dict_terms,dict_docs, filename)
+def loadInvertedIndex(dict_terms,dict_docs,path,filetype,stopwords):
+    spath = path + "/*.txt"
+    files = glob.glob(spath)
+    if(filetype=="text"):
+      for fname in files:
+         filename=fname[5:]
+         dict_docs[filename] = 0
+         with open(fname) as f: #file
+             for line in f:
+                 line_proc(line.strip().split(' '),dict_terms,dict_docs, filename,stopwords)
+    if(filetype=="trec"):
+     for fname in files:
+         with open(fname) as f: #file
+             print('open file: ', f)
+             soup = BeautifulSoup(f,'html.parser')
+             for doc in soup.find_all('DOC'):
+                 print("doc:", doc)
+                 for eachdoc in doc.find_all('DOCNO'):
+                    filename=eachdoc
+                    dict_docs[filename] = 0
 
 def Prompt(dict_terms,dict_docs):
  run=True
-
  while run:
    x=input('enter the term of interest.')
    x=x.lower()
+   x=ps.stem(x)
    if x =='quit':
        run=False
        continue
@@ -135,22 +153,56 @@ def Prompt(dict_terms,dict_docs):
 
    else:
        print('not in the inverted file')
+#Part 1 -
+#def cosineSimilarity(query, document):
 
 
+#Part 2 - Query Execution
+#run the queries in the file results file.txt
+"""def RunQuerylist(path,stopwords):
+ spath = path + "/*.txt"
+ files = glob.glob(spath)
+ for fname in files:
+     with open(fname) as f: #file
+         for line in f:
+             line_proc(line, dict_terms,dict_docs,fname,stopwords)
+             line_proc(line.strip().split(' '),dict_terms,dict_docs, filename,stopwords)
+"""
+def DriverAssnment1():
+    # load stop words
+    stopwords=[]
+    path1="stopwords"
+    load_stops(stopwords,path1)
+
+    # load distionary with counts
+    dict_terms={}
+    dict_docs={}
+    path2="data"
+    loadWcountWDoc(dict_terms,dict_docs,path2)
+    t=dict_terms['system']
+    #t.display_wieghtings(dict_docs)
+    Prompt(dict_terms,dict_docs)
+
+def DriverParserUpdate(stopwords,dict_terms,dict_docs):
+     # load stop words
+
+    path1="stopwords"
+    load_stops(stopwords,path1)
+
+    path2="data"
+    filetype="trec"
 
 
+    loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
+#  soup.get_text()
 
-# load stop words
+
 stopwords=[]
-path1="s"
-load_stops(stopwords,path1)
-ps = PorterStemmer()
-# load distionary with counts
-
 dict_terms={}
 dict_docs={}
+path1="stopwords"
+load_stops(stopwords,path1)
 path2="data"
-loadWcountWDoc(dict_terms,dict_docs,path2)
-t=dict_terms['system']
-#t.display_wieghtings(dict_docs)
-Prompt(dict_terms,dict_docs)
+filetype="trec"
+loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
+#DriverParserUpdate(stopwords,dict_terms,dict_docs)
