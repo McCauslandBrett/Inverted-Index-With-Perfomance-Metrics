@@ -27,7 +27,7 @@ open(QREL, $qrel_file) or
   die "Failed to open $qrel_file: $!\n\n";
 
 {
-local $/ = undef;			# Reads grab the whole file.
+local $/ = undef;			        # Reads grab the whole file.
 @data = split(/\s+/, <QREL>);		# Data array has all values from the
 }					# file consecutively.
 
@@ -69,9 +69,9 @@ open(TREC, $trec_file) or
   die "Failed to open $trec_file: $!\n\n";
 
 {
-local $/ = undef;			# Reads grab the whole file.
+local $/ = undef;			        # Reads grab the whole file.
 @data = split(/\s+/, <TREC>);		# Data array has all values from the
-}					# file consecutively.
+}					                # file consecutively.
 
 close(TREC) or
   die "Couldn't close $qrel_file: $!\n\n";

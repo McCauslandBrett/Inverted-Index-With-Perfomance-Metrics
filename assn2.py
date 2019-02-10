@@ -18,6 +18,9 @@ import math
 import glob
 import errno
 import os
+from nltk.stem import PorterStemmer
+from nltk.tokenize import sent_tokenize, word_tokenize
+
 
 import sqlite3
 import numpy as np
@@ -117,6 +120,7 @@ def loadWcountWDoc(dict_terms,dict_docs,path):
 
 def Prompt(dict_terms,dict_docs):
  run=True
+
  while run:
    x=input('enter the term of interest.')
    x=x.lower()
@@ -140,7 +144,7 @@ def Prompt(dict_terms,dict_docs):
 stopwords=[]
 path1="s"
 load_stops(stopwords,path1)
-
+ps = PorterStemmer()
 # load distionary with counts
 
 dict_terms={}
