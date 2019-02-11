@@ -44,7 +44,8 @@ ps = PorterStemmer()
 
 class Query:
     def __init__(self,str_words,stopwords):
-     self.Ranks={}
+     self.Scores={}
+     self.Ranks=[]
      self.dict_words={}
      self.numwords=0
      self.tf_wieghts=[]
@@ -167,7 +168,7 @@ def line_proc(line, dict_terms,dict_docs,fname,stopwords):
 
 def loadInvertedIndex(dict_terms,dict_docs,path,filetype,stopwords):
       if(filetype=="trec"):
-         print(' trec ')
+         #print(' trec ')
          soup = BeautifulSoup(open(path),"lxml")
          #print(soup)
          for doc in soup.find_all('doc'):
@@ -221,11 +222,11 @@ def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
     #qi is the tf-idf weight of term i in the query
     #di is the tf_idf term i in the document
     d=[]
-    print(fname)
+    #print(fname)
     for word in Query.dict_words: #check every word in the query
-       print(word) 
+       #print(word) 
        if word in dict_terms: # if word is a dictionary word
-          print(word,"in dictionary")
+          #print(word,"in dictionary")
           curterm = dict_terms[word] # get term from dictionary
           if curterm.existposting(fname):
             print("match")
@@ -234,23 +235,16 @@ def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
             d.append(0)
        else:
             d.append(0)
-    print(d)
-    print(cosineSimilarity(d, Query.tf_wieghts))
-    Query.Ranks[fname]=cosineSimilarity(d, Query.tf_wieghts)    
+    #print(d)
+    #print(cosineSimilarity(d, Query.tf_wieghts))
+    Query.Scores[fname]=cosineSimilarity(d, Query.tf_wieghts)    
     
-"""
+
 #Part 2 - Query Execution
 #run the queries in the file results file.txt
 
-def RunQuerylist(path,stopwords):
- spath = path + "/*.txt"
- files = glob.glob(spath)
- for fname in files:
-     with open(fname) as f: #file
-         for line in f:
-             line_proc(line, dict_terms,dict_docs,fname,stopwords)
-             line_proc(line.strip().split(' '),dict_terms,dict_docs, filename,stopwords)
-"""
+
+
 def DriverAssnment1():
     # load stop words
     stopwords=[]
@@ -278,9 +272,27 @@ def DriverParserUpdate(stopwords,dict_terms,dict_docs):
 
     loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
 #  soup.get_text()
+def loadquerys(list_querys,path):
+ files = glob.glob(path)
+ for fname in files:
+     with open(fname) as f: #file
+         for line in f:
+             i=line.index("Document")
+             line=line[i+13:]
+             print(line)
+             query=Query(line,stopwords)
+             list_querys.append(query)
 
-
-
+def RunQuerylist(list_querys,dict_terms,stopwords,dict_docs):
+    for query in list_querys:
+        for doc in dict_docs:
+            documentRelavanceScore(doc,query,dict_terms,stopwords,dict_docs)
+def RankQuerylist(list_querys):
+    for query in list_querys:
+        query.Ranks = sorted(query.Scores.items(), key=operator.itemgetter(1))
+        
+      
+        
 stopwords=[]
 dict_terms={}
 dict_docs={}
@@ -301,9 +313,11 @@ query=Query(query_str,stopwords)
 print(query.dict_words)
 print(query.tf_wieghts)
 documentRelavanceScore(fname,query,dict_terms,stopwords,dict_docs)
+list_querys=[]
 
-
-
-
+path_querys="querys/query_list.txt"
+loadquerys(list_querys,path_querys)
+RunQuerylist(list_querys,dict_terms,stopwords,dict_docs)
+RankQuerylist(list_querys)
 
 
