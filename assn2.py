@@ -30,6 +30,7 @@ from sklearn.preprocessing import Imputer
 from sklearn.cross_validation import train_test_split
 import bs4 as bs
 import urllib.request
+import urllib
 
 import pandas as pd
 from collections import namedtuple
@@ -98,6 +99,8 @@ def load_line(l_line, stopwords):
 # Updates word count in fname for every word
 #
 def line_proc(line, dict_terms,dict_docs,fname,stopwords):
+   print("-----------------------------------------------------------")
+   print(line)
    for word in line:
        w=word.lower()
        w=ps.stem(w)
@@ -116,25 +119,19 @@ def line_proc(line, dict_terms,dict_docs,fname,stopwords):
                dict_terms[w] = t
 
 def loadInvertedIndex(dict_terms,dict_docs,path,filetype,stopwords):
-    spath = path + "/*.txt"
-    files = glob.glob(spath)
-    if(filetype=="text"):
-      for fname in files:
-         filename=fname[5:]
-         dict_docs[filename] = 0
-         with open(fname) as f: #file
-             for line in f:
-                 line_proc(line.strip().split(' '),dict_terms,dict_docs, filename,stopwords)
-    if(filetype=="trec"):
-     for fname in files:
-         with open(fname) as f: #file
-             print('open file: ', f)
-             soup = BeautifulSoup(f,'html.parser')
-             for doc in soup.find_all('DOC'):
-                 print("doc:", doc)
-                 for eachdoc in doc.find_all('DOCNO'):
-                    filename=eachdoc
-                    dict_docs[filename] = 0
+      if(filetype=="trec"):
+         print(' trec ')
+         soup = BeautifulSoup(open(path),"lxml")
+         print('Good')
+         #print(soup)
+         for doc in soup.find_all('doc'):
+            for eachdoc in doc.find_all('docno'):
+                filename=eachdoc.text
+                dict_docs[filename] = 0
+                for txt in doc.find('text'):
+                  line_proc(txt.strip().split(' '),dict_terms,dict_docs, filename,stopwords)
+                        
+             
 
 def Prompt(dict_terms,dict_docs):
  run=True
@@ -189,7 +186,7 @@ def DriverParserUpdate(stopwords,dict_terms,dict_docs):
     path1="stopwords"
     load_stops(stopwords,path1)
 
-    path2="data"
+    path2="data/ap98_collection.html"
     filetype="trec"
 
 
@@ -202,7 +199,8 @@ dict_terms={}
 dict_docs={}
 path1="stopwords"
 load_stops(stopwords,path1)
-path2="data"
+path2="data/ap89_collection.html"
+
 filetype="trec"
 loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
 #DriverParserUpdate(stopwords,dict_terms,dict_docs)
