@@ -44,7 +44,7 @@ ps = PorterStemmer()
 
 class Query:
     def __init__(self,str_words,stopwords):
-     self.rank=0
+     self.Ranks={}
      self.dict_words={}
      self.numwords=0
      self.tf_wieghts=[]
@@ -227,21 +227,22 @@ def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
        if word in dict_terms: # if word is a dictionary word
           print(word,"in dictionary")
           curterm = dict_terms[word] # get term from dictionary
-          #curterm.printPostings()    
-          # curterm.get_Doc_tf(fname,dict_docs) # access the posting in the term for doc
-          d.append(curterm.get_IDF_TF(fname,dict_docs))
-          """ if curterm.existposting(fname):
+          if curterm.existposting(fname):
             print("match")
-            post = curterm.getPostings()
-            print(post)
-            print("match")"""
-       
-        
+            d.append(curterm.get_IDF_TF(fname,dict_docs))
+          else:
+            d.append(0)
+       else:
+            d.append(0)
+    print(d)
+    print(cosineSimilarity(d, Query.tf_wieghts))
+    Query.Ranks[fname]=cosineSimilarity(d, Query.tf_wieghts)    
     
-
+"""
 #Part 2 - Query Execution
 #run the queries in the file results file.txt
-"""def RunQuerylist(path,stopwords):
+
+def RunQuerylist(path,stopwords):
  spath = path + "/*.txt"
  files = glob.glob(spath)
  for fname in files:
@@ -297,6 +298,8 @@ loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
 fname= 'AP890101-0003'
 query_str = " A fast-spreading fire swept through a home "
 query=Query(query_str,stopwords)
+print(query.dict_words)
+print(query.tf_wieghts)
 documentRelavanceScore(fname,query,dict_terms,stopwords,dict_docs)
 
 
