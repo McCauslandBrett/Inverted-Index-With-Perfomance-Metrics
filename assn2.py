@@ -69,6 +69,8 @@ class Query:
      def vectorSpace(self):
          for word in self.dict_words:
              self.tf_wieghts.append(self.getTF(word))
+    def generateRank(self):
+        
    
   
 class term:
@@ -284,13 +286,19 @@ def loadquerys(list_querys,path):
              list_querys.append(query)
 
 def RunQuerylist(list_querys,dict_terms,stopwords,dict_docs):
+    query_num=0
     for query in list_querys:
+        query_num+=1
         for doc in dict_docs:
             documentRelavanceScore(doc,query,dict_terms,stopwords,dict_docs)
+        f=open(str(query_num)+".txt", "a+")
+        
+        for r in q
+        f.write("Appended line %d\r\n" % (i+1))
 def RankQuerylist(list_querys):
     for query in list_querys:
         query.Ranks = sorted(query.Scores.items(), key=operator.itemgetter(1))
-        
+       
       
         
 stopwords=[]
