@@ -19,11 +19,11 @@ import glob
 import errno
 import os
 
-import sqlite3
+from ObjectFiles import *
 import numpy as np
-import matplotlib.pyplot as plt
+
 import pandas as pd
-import seaborn as sns
+
 import operator
 from operator import itemgetter, attrgetter
 from sklearn.preprocessing import Imputer
@@ -42,95 +42,9 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from bs4  import BeautifulSoup
 ps = PorterStemmer()
 
-class Query:
-    def __init__(self,str_words,stopwords):
-     self.Scores={}
-     self.Ranks=[]
-     self.dict_words={}
-     self.numwords=0
-     self.tf_wieghts=[]
-     
-     words = ps.stem(str_words).lower().strip().split(' ')
-     for w in words:
-        if w not in stopwords:
-            if w in self.dict_words:
-              self.dict_words[w]+= 1
-              self.numwords+=1
-            else:
-              self.dict_words[w] = 1
-              self.numwords+=1
-     #self.vectorSpace()
-     for word in self.dict_words:
-             self.tf_wieghts.append(self.dict_words[word]/self.numwords)
-              
-     def getTF(self,word):
-         return self.dict_words[word]/self.numwords
-     
-     def vectorSpace(self):
-         for word in self.dict_words:
-             self.tf_wieghts.append(self.getTF(word))
-    def generateRank(self):
-        
-   
-  
-class term:
-    def __init__(self,numdocs,postings):
-        self.numdocs=numdocs
-        self.postings=postings
 
-    def insertposting(self,fname):
-        self.postings[fname]=1
-        self.numdocs+=1
-
-    def incrdocfreq(self,fname):
-        self.postings[fname]+=1
-
-    def existposting(self,fname):
-      if fname in self.postings:
-          return True
-      return False
-  
-    def printPostings(self):
-        print(self.postings)
-        
-    def getPostings(self):
-        return self.postings
-    
-    def get_Doc_tf(self,doc,dict_docs):
-        if fname in self.postings:
-         postnum=self.postings[doc]
-         num_word_in_doc=dict_docs[doc]
-         return postnum/num_word_in_doc
-        else:
-         return 0
-     
-    def get_IDF_TF(self,doc,dict_docs):
-          tot_numdocs=len(dict_docs)
-          numdoc_term_in= len(self.postings)
-          df= tot_numdocs/numdoc_term_in+1
-          idf = math.log(2, df)
-          return self.get_Doc_tf(doc,dict_docs) * idf
-        
-    def display_wieghtings(self,dict_docs):
-       for post in self.postings:
-          #print(post)
-          numwords_in_post=dict_docs[post]
-          #print( numwords_in_post)
-          term_freq = self.postings[post]
-          #print (term_freq)
-          tf = term_freq/numwords_in_post
-          numdicts=len(dict_docs)
-          #print(numdicts)
-          numdoc_term_in= len(self.postings)
-          df= numdicts/numdoc_term_in+1
-          idf = math.log(2, df)
-          #print(idf)
-          print(post,',',round(tf,4),',',round(idf,4),',',round(tf*idf,4))
-              #tf, idf, and tf-idf i
-         #print(post,self.postings[post])
-
-
-
+#precondition:
+#postcondition:  
 def load_stops(stopwords,path):
 
  spath = path + "/*.txt"
@@ -141,15 +55,20 @@ def load_stops(stopwords,path):
              load_line(line.strip().split(' '), stopwords)
 
 
+#precondition:
+#postcondition:  
 def load_line(l_line, stopwords):
    for word in l_line:
        stopwords.insert(0,word.lower())
 
 
-# makes all word in line lowercase
-# implements stemming
-# Updates word count in fname for every word
-#
+
+#precondition:
+#postcondition:
+#Summary:
+ # makes all word in line lowercase
+ # implements stemming
+ # Updates word count in fname for every word
 def line_proc(line, dict_terms,dict_docs,fname,stopwords):
    for word in line:
        w=word.lower()
@@ -167,7 +86,9 @@ def line_proc(line, dict_terms,dict_docs,fname,stopwords):
                postings[fname]=1
                t =term(1,postings)
                dict_terms[w] = t
-
+               
+#precondition:
+#postcondition:  
 def loadInvertedIndex(dict_terms,dict_docs,path,filetype,stopwords):
       if(filetype=="trec"):
          #print(' trec ')
@@ -182,7 +103,8 @@ def loadInvertedIndex(dict_terms,dict_docs,path,filetype,stopwords):
                   line_proc(txt.strip().split(' '),dict_terms,dict_docs, filename,stopwords)
                         
              
-
+#precondition:
+#postcondition:  
 def Prompt(dict_terms,dict_docs):
  run=True
  while run:
@@ -195,27 +117,21 @@ def Prompt(dict_terms,dict_docs):
    if x in dict_terms:
        term=dict_terms[x]
        print("list of the postings for that term:")
-       #print(t.postings)
        term.display_wieghtings(dict_docs)
-
    else:
        print('not in the inverted file')
-#Part 1 -
+
+#precondition:
+#postcondition:  
 def cosineSimilarity(arr_query, arr_doc):
 	dot_product = np.dot(arr_query,arr_doc)
 	norm_query = np.linalg.norm(arr_query)
 	norm_doc = np.linalg.norm(arr_doc)
 	return dot_product / (norm_query * norm_doc )
 
-"""def preprocessQuery(str_Query,stopwords):
-    w=[]
-    l=[]
-    words = ps.stem(str_Query).lower().strip().split(' ')
-    for w in words:
-        if w not in stopwords:
-            l.append(w)
-    return l
-"""           
+
+#precondition:
+#postcondition:           
 def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
     # Use the vector space model to compute scores
     # Use cosine Similarity to compute score between 
@@ -231,7 +147,7 @@ def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
           #print(word,"in dictionary")
           curterm = dict_terms[word] # get term from dictionary
           if curterm.existposting(fname):
-            print("match")
+           # print("match")
             d.append(curterm.get_IDF_TF(fname,dict_docs))
           else:
             d.append(0)
@@ -246,7 +162,8 @@ def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
 #run the queries in the file results file.txt
 
 
-
+#precondition:
+#postcondition:  
 def DriverAssnment1():
     # load stop words
     stopwords=[]
@@ -259,73 +176,79 @@ def DriverAssnment1():
     path2="data"
     loadWcountWDoc(dict_terms,dict_docs,path2)
     t=dict_terms['system']
-    #t.display_wieghtings(dict_docs)
     Prompt(dict_terms,dict_docs)
 
+#precondition:
+#postcondition:  
 def DriverParserUpdate(stopwords,dict_terms,dict_docs):
      # load stop words
-
     path1="stopwords"
     load_stops(stopwords,path1)
-
     path2="data/ap98_collection.html"
     filetype="trec"
-
-
     loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
-#  soup.get_text()
+
+#precondition:
+#postcondition:  
 def loadquerys(list_querys,path):
  files = glob.glob(path)
+ num=0
  for fname in files:
      with open(fname) as f: #file
          for line in f:
+             num+=1
              i=line.index("Document")
              line=line[i+13:]
              print(line)
-             query=Query(line,stopwords)
+             query=Query(line,stopwords, num)
              list_querys.append(query)
 
+# precondition:
+# postcondition:
+ # Summary:            
+ # for each query in list of querys
+ #  compare it with each doc everydoc
+ # rank all the documents
+ # save results for each query to a file
 def RunQuerylist(list_querys,dict_terms,stopwords,dict_docs):
     query_num=0
-    for query in list_querys:
+    for each_query in list_querys:
         query_num+=1
-        for doc in dict_docs:
-            documentRelavanceScore(doc,query,dict_terms,stopwords,dict_docs)
-        f=open(str(query_num)+".txt", "a+")
-        
-        for r in q
-        f.write("Appended line %d\r\n" % (i+1))
+        for each_doc in dict_docs:
+            documentRelavanceScore(each_doc,each_query,dict_terms,stopwords,dict_docs)
+        each_query.generateRank()
+        each_query.saveQuerytofile()
+  
+
+#precondition:
+#postcondition:  
 def RankQuerylist(list_querys):
     for query in list_querys:
         query.Ranks = sorted(query.Scores.items(), key=operator.itemgetter(1))
        
-      
+def main():
+ # display some lines
+ stopwords=[]
+ dict_terms={}
+ dict_docs={}
+ path1="stopwords"
+ load_stops(stopwords,path1)
+ path2="data/ap89_collection.html"
+ filetype="trec"
+ loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
+ query_str = " A fast-spreading fire swept through a home "
+ query=Query(query_str,stopwords,1)
+ print(query.dict_words)
+ print(query.tf_wieghts)
+# ----------------------- driver document Relavance Score ------------------------
+ list_querys=[]
+ path_querys="querys/query_list.txt"
+ loadquerys(list_querys,path_querys)
+ RunQuerylist(list_querys,dict_terms,stopwords,dict_docs)
+if __name__ == "__main__":
+    main()     
         
-stopwords=[]
-dict_terms={}
-dict_docs={}
-path1="stopwords"
-load_stops(stopwords,path1)
-path2="data/ap89_collection.html"
 
-filetype="trec"
-loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
-"""
-#DriverParserUpdate(stopwords,dict_terms,dict_docs)
-"""
-# ----------------------- driver documentRelavanceScore ------------------------
 
-fname= 'AP890101-0003'
-query_str = " A fast-spreading fire swept through a home "
-query=Query(query_str,stopwords)
-print(query.dict_words)
-print(query.tf_wieghts)
-documentRelavanceScore(fname,query,dict_terms,stopwords,dict_docs)
-list_querys=[]
-
-path_querys="querys/query_list.txt"
-loadquerys(list_querys,path_querys)
-RunQuerylist(list_querys,dict_terms,stopwords,dict_docs)
-RankQuerylist(list_querys)
 
 
