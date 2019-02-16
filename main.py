@@ -62,7 +62,6 @@ def load_line(l_line, stopwords):
        stopwords.insert(0,word.lower())
 
 
-
 #precondition:
 #postcondition:
 #Summary:
@@ -90,10 +89,9 @@ def line_proc(line, dict_terms,dict_docs,fname,stopwords):
 #precondition:
 #postcondition:  
 def loadInvertedIndex(dict_terms,dict_docs,path,filetype,stopwords):
-      if(filetype=="trec"):
-         #print(' trec ')
+      
+    if(filetype=="trec"):
          soup = BeautifulSoup(open(path),"lxml")
-         #print(soup)
          for doc in soup.find_all('doc'):
             for eachdoc in doc.find_all('docno'):
                 s=eachdoc.text.strip().split(' ')
@@ -140,7 +138,6 @@ def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
     #qi is the tf-idf weight of term i in the query
     #di is the tf_idf term i in the document
     d=[]
-    #print(fname)
     for word in Query.dict_words: #check every word in the query
        #print(word) 
        if word in dict_terms: # if word is a dictionary word
@@ -153,30 +150,7 @@ def documentRelavanceScore(fname,Query,dict_terms,stopwords,dict_docs):
             d.append(0)
        else:
             d.append(0)
-    #print(d)
-    #print(cosineSimilarity(d, Query.tf_wieghts))
     Query.Scores[fname]=cosineSimilarity(d, Query.tf_wieghts)    
-    
-
-#Part 2 - Query Execution
-#run the queries in the file results file.txt
-
-
-#precondition:
-#postcondition:  
-def DriverAssnment1():
-    # load stop words
-    stopwords=[]
-    path1="stopwords"
-    load_stops(stopwords,path1)
-
-    # load distionary with counts
-    dict_terms={}
-    dict_docs={}
-    path2="data"
-    loadWcountWDoc(dict_terms,dict_docs,path2)
-    t=dict_terms['system']
-    Prompt(dict_terms,dict_docs)
 
 #precondition:
 #postcondition:  
@@ -214,10 +188,12 @@ def RunQuerylist(list_querys,dict_terms,stopwords,dict_docs):
     query_num=0
     for each_query in list_querys:
         query_num+=1
-        for each_doc in dict_docs:
+        print(dict_docs)
+        """for each_doc in dict_docs:
             documentRelavanceScore(each_doc,each_query,dict_terms,stopwords,dict_docs)
         each_query.generateRank()
         each_query.saveQuerytofile()
+        """
   
 
 #precondition:
@@ -226,25 +202,35 @@ def RankQuerylist(list_querys):
     for query in list_querys:
         query.Ranks = sorted(query.Scores.items(), key=operator.itemgetter(1))
        
+def driverRunQuerylist(stopwords,dict_terms,dict_docs):
+   
+   #load stopwords
+   path1="stopwords"
+   load_stops(stopwords,path1)
+   
+   #load data
+   dataPath ="data/ap89_collection.html"
+   filetype="trec"
+   loadInvertedIndex(dict_terms,dict_docs,dataPath,filetype,stopwords)
+   
+    #load Querys
+   list_querys=[]
+   path_querys="querys/query_list.txt"
+   loadquerys(list_querys,path_querys)
+   
+   # Run querys
+   RunQuerylist(list_querys,dict_terms,stopwords,dict_docs)
+
+
+
+stopwords=[]
+dict_terms={}
+dict_docs={}
+
 def main():
- # display some lines
- stopwords=[]
- dict_terms={}
- dict_docs={}
- path1="stopwords"
- load_stops(stopwords,path1)
- path2="data/ap89_collection.html"
- filetype="trec"
- loadInvertedIndex(dict_terms,dict_docs,path2,filetype,stopwords)
- query_str = " A fast-spreading fire swept through a home "
- query=Query(query_str,stopwords,1)
- print(query.dict_words)
- print(query.tf_wieghts)
-# ----------------------- driver document Relavance Score ------------------------
- list_querys=[]
- path_querys="querys/query_list.txt"
- loadquerys(list_querys,path_querys)
- RunQuerylist(list_querys,dict_terms,stopwords,dict_docs)
+    
+ driverRunQuerylist(stopwords,dict_terms,dict_docs)
+ 
 if __name__ == "__main__":
     main()     
         

@@ -30,7 +30,7 @@ class term:
         return self.postings
     
     def get_Doc_tf(self,doc,dict_docs):
-        if fname in self.postings:
+        if doc in self.postings:
          postnum=self.postings[doc]
          num_word_in_doc=dict_docs[doc]
          return postnum/num_word_in_doc
