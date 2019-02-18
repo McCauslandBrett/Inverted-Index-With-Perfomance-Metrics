@@ -39,7 +39,7 @@ class term:
         else:
          return 0
      
-    def set_IDF_TF(self,doc,dict_docs):
+    def get_IDF_TF(self,doc,dict_docs):
           tot_numdocs=len(dict_docs)
           df= tot_numdocs/self.numdocs+1
           idf = math.log(2, df)

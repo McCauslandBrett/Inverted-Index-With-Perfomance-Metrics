@@ -79,10 +79,6 @@ def driverInvertedobject():
    Qlist.runQuerylist(Invertobj.dict_terms,Invertobj.dict_docs)
 
 
-stopwords=[]
-dict_terms={}
-dict_docs={}
-
 def main():
     
  driverInvertedobject()

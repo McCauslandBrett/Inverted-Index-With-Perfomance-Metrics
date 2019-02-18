@@ -79,12 +79,14 @@ class Query:
     #postcondition:            
     def saveQuerytofile(self):
         # <query−number> Q0 <docno> <rank> <score> Exp
-        file = open(str(self.idnum)+".txt", 'w')
+       print(self.idnum)
+       """ file = open(self.idnum+".txt", 'w')
         res_list = [x[1] for x in self.Ranks]
         for lines in res_list:
             #print(lines)
             file.writelines(str(lines)+"\n")
         file.close()
+        """
        
         
         

@@ -5,7 +5,7 @@ Created on Sun Feb 17 14:15:51 2019
 
 @author: Brettmccausland
 """
-
+import glob
 class StopWordManger:
     
    def __init__(self,spath):
