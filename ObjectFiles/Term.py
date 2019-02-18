@@ -5,11 +5,13 @@ Created on Fri Feb 15 18:59:57 2019
 
 @author: Brettmccausland
 """
-
+import math
 class term:
     def __init__(self,numdocs,postings):
         self.numdocs=numdocs
         self.postings=postings
+        self.tf=0
+        self.numDocTermIn = 0
 
     def insertposting(self,fname):
         self.postings[fname]=1
@@ -37,16 +39,14 @@ class term:
         else:
          return 0
      
-    def get_IDF_TF(self,doc,dict_docs):
+    def set_IDF_TF(self,doc,dict_docs):
           tot_numdocs=len(dict_docs)
-          numdoc_term_in= len(self.postings)
-          df= tot_numdocs/numdoc_term_in+1
+          df= tot_numdocs/self.numdocs+1
           idf = math.log(2, df)
           return self.get_Doc_tf(doc,dict_docs) * idf
         
     def display_wieghtings(self,dict_docs):
        for post in self.postings:
-          #print(post)
           numwords_in_post=dict_docs[post]
           #print( numwords_in_post)
           term_freq = self.postings[post]
@@ -54,8 +54,7 @@ class term:
           tf = term_freq/numwords_in_post
           numdicts=len(dict_docs)
           #print(numdicts)
-          numdoc_term_in= len(self.postings)
-          df= numdicts/numdoc_term_in+1
+          df= numdicts/self.numdocs
           idf = math.log(2, df)
           #print(idf)
           print(post,',',round(tf,4),',',round(idf,4),',',round(tf*idf,4))
