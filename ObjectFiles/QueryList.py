@@ -13,10 +13,11 @@ ps = PorterStemmer()
 
 class QueryList:
     
-    def __init__(self,path_querys,list_stopwords):
+    def __init__(self,path_querys,list_stopwords,output_path):
      self.list_querys = []
      self.path= path_querys  
      self.loadquerylist(list_stopwords)
+     self.outputfile= output_path
                  
    # precondition: dictionary terms, dictionary documents
    # postcondition:
@@ -28,9 +29,10 @@ class QueryList:
     def runQuerylist(self,dict_terms,dict_docs):
          for each_query in self.list_querys:
            for each_doc in dict_docs:
-            each_query.setScores(each_doc,dict_terms,dict_docs)
-            each_query.setRank()
-            each_query.saveQuerytofile()
+            each_query.setdocScores(each_doc,dict_terms,dict_docs)
+            each_query.setRanks()
+            each_query.saveQuerytofile(self.outputfile)
+            
      
     def loadquerylist(self,list_stopwords):
       files = glob.glob(self.path)

@@ -15,10 +15,6 @@ References: https://stackabuse.com/read-a-file-line-by-line-in-python/
 """
 
 
-
-import errno
-import os
-
 from ObjectFiles import *
 import numpy as np
 
@@ -26,8 +22,7 @@ import pandas as pd
 
 
 
-from sklearn.preprocessing import Imputer
-from sklearn.cross_validation import train_test_split
+
 import bs4 as bs
 import urllib.request
 import urllib
@@ -71,9 +66,10 @@ def driverInvertedobject():
    
    #load data
    Invertobj = InvertedIndex("data/ap89_collection.html",stopwords.list_stopwords)
+   print(Invertobj.dict_docs)
    
    #load QuerysList
-   Qlist= QueryList("querys/query_list.txt",stopwords.list_stopwords)
+   Qlist= QueryList("querys/query_list.txt",stopwords.list_stopwords,'results_file')
    
    # Run querys
    Qlist.runQuerylist(Invertobj.dict_terms,Invertobj.dict_docs)

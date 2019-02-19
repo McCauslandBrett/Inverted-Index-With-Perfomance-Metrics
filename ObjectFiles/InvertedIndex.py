@@ -20,6 +20,7 @@ class InvertedIndex:
         self.dict_docs={}
         self.stopwords=_stopwords
         self.path=_path
+        self.loadInvertedIndex(_path,_stopwords)
         
 #precondition:
 #postcondition: 
@@ -29,7 +30,7 @@ class InvertedIndex:
  # Updates word count in fname for every word
     def line_proc(self,line,dict_docs,fname,stopwords):
       for word in line:
-        w=ps.stem(w)
+        w=ps.stem(word)
         if w not in stopwords:
            w=word.lower()
            dict_docs[fname] += 1

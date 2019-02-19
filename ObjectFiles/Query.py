@@ -6,22 +6,24 @@ Created on Fri Feb 15 18:58:49 2019
 @author: Brettmccausland
 """
 from nltk.stem import PorterStemmer
+import numpy as np
 ps = PorterStemmer()
 from operator import itemgetter, attrgetter
 import operator
+from sklearn.metrics.pairwise import cosine_similarity
 class Query:
-    
+
     def __init__(self,str_words,list_stopwords,query_num):
-     self.Scores={}
+     self.docScores={}
      self.Ranks=[]
      self.Identifier=str_words
      self.idnum=query_num
      self.dict_querywords = {}
      self.numwords=0
-     self.list_tfwieghts=[]
+     self.tfwieghts=[]
      self.load_query(list_stopwords)
-     
-     
+
+
     def load_query(self,list_stopwords):
        words = ps.stem(self.Identifier).lower().strip().split(' ')
        for w in words:
@@ -32,77 +34,64 @@ class Query:
               self.dict_querywords[w] = 1
               self.numwords+=1
        self.setlist_tfwieghts()
-        
+
     def getTF(self,word):
          return self.dict_querywords[word]/self.numwords
-     
+
     def setlist_tfwieghts(self):
          for word in self.dict_querywords:
-             self.list_tfwieghts.append(self.getTF(word))
-        
-#precondition: 
-  #  Query contains dict of words  
+             self.tfwieghts.append(self.getTF(word))
+         self.tfwieghts = np.array(self.tfwieghts)
+
+#precondition:
+  #  Query contains dict of words
   #  dict terms contains the terms in vec space
-     
-#postcondition: 
+
+#postcondition:
   #  Query Scores Key: fname , Value: Cosine Similarity is added for all Querys
-  #  Document space is built on the same vector space as the query        
-    def setScores(self,fname,dict_terms,dict_docs):
+  #  Document space is built on the same vector space as the query
+    def setdocScores(self,fname,dict_terms,dict_docs):
      doc_space=[] # document space
      for word in self.dict_querywords: # check every word in the query
        if word in dict_terms:     # if word is a dictionary word
           curterm = dict_terms[word] # get term from dictionary
           if curterm.existposting(fname): # check if file has term from the postings in the term
-           doc_space.append(curterm.set_IDF_TF(fname,dict_docs)) # add wieghting to document space
+           doc_space.append(curterm.get_IDF_TF(fname,dict_docs)) # add wieghting to document space
           else:
-            doc_space.append(0) # add wieght of 0 if term is not in doc 
+            doc_space.append(0) # add wieght of 0 if term is not in doc
        else:
             doc_space.append(0) # add wieght of 0 if term is not in dict aka not in postings
-     Query.Scores[fname]= cosineSimilarity(doc_space, self.list_tfwieghts)  # add cosine sim score for the file  
+     self.docScores[fname]= self.cosineSimilarity(doc_space)
 
     def setRanks(self):
-        for query in self.Scores:
-         self.Ranks = sorted(self.Scores.items(), key=operator.itemgetter(1))
-        '''self.Ranks= list(self.Scores.items())
-        self.Ranks= sorted(self.Ranks, key=itemgetter(1),reverse=True)'''
-        
+        Sortedscores = sorted(self.docScores.items(), key=operator.itemgetter(1),reverse=True)
+        rank=1
+        for items in Sortedscores:
+            #   (rank, doc_no , score )
+            tup=(rank,items[0],items[1])
+            self.Ranks.append(tup)
+            rank+=1
+
     #precondition:
-    #postcondition:  
-    def cosineSimilarity(self,arr_query, arr_doc):
-       """ dot_product = np.dot(arr_query,arr_doc)
-        m_query = np.linalg.norm(arr_query)
-        m_doc = np.linalg.norm(arr_doc)
-        return  dot_product / (norm_query * norm_doc ) + 1"""
+    #postcondition:
+    def cosineSimilarity(self,arr_doc):
+      dot = np.dot(arr_doc,self.tfwieghts)
+      normarr_doc = np.linalg.norm(arr_doc)
+      normtfwieghts = np.linalg.norm(self.tfwieghts)
+      return dot / ((normarr_doc * normtfwieghts) + 1)
 
 
     #precondition:
-    #postcondition:            
-    def saveQuerytofile(self):
+    #postcondition:
+    def saveQuerytofile(self,path):
         # <query−number> Q0 <docno> <rank> <score> Exp
-       print(self.idnum)
-       """ file = open(self.idnum+".txt", 'w')
-        res_list = [x[1] for x in self.Ranks]
-        for lines in res_list:
-            #print(lines)
-            file.writelines(str(lines)+"\n")
+        file = open(path+".txt", 'a+')
+        querynumber= str(self.idnum)
+        for tups in self.Ranks:
+            rank=str(tups[0])
+            docno=str(tups[1])
+            score=str(tups[2])
+            file.writelines('<'+ querynumber +'>'+ 'Q0' + '<'+ docno +'>'
+                            + '<'+ rank +'<'+ score + '>' + 'Exp' + "\n")
         file.close()
-        """
-       
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+      
