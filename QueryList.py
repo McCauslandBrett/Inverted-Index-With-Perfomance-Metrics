@@ -5,7 +5,7 @@ Created on Sun Feb 17 13:56:50 2019
 
 @author: Brettmccausland
 """
-from ObjectFiles import *
+
 import glob
 from nltk.stem import PorterStemmer
 

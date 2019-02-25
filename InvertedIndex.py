@@ -5,7 +5,7 @@ Created on Sun Feb 17 13:25:58 2019
 
 @author: Brettmccausland
 """
-from ObjectFiles import *
+
 from bs4  import BeautifulSoup
 import numpy as np
 import pandas as pd
