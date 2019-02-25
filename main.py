@@ -15,7 +15,9 @@ References: https://stackabuse.com/read-a-file-line-by-line-in-python/
 """
 
 
-from ObjectFiles import *
+from StopWordManger import *
+from InvertedIndex import *
+from QueryList import *
 import numpy as np
 
 import pandas as pd
