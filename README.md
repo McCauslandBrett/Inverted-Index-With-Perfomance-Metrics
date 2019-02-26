@@ -1,4 +1,4 @@
-# IRassn1
+# IRassn2
 
 Design:
 DATA_STRUCTURE_1: term        := user defined class that contains DATA_STRUCTURE_2: postings and number of documents its in
@@ -6,6 +6,10 @@ DATA_STRUCTURE_2: postings    := python dictionary, Key is filename, Value is nu
 DATA_STRUCTURE_3: dict_docs   := python dictionary, Key is filename, Value is number of words
 DATA_STRUCTURE_4: dict_terms  := python dictionary, Key is term "string" , Value is DATA_STRUCTURE_1: term 
 DATA_STRUCTURE_5: stop_words  := python list, conatians all stopwords
+DATA_STRUCTURE_6: InvertedIndex   := user defined class, Decorater of DATA_STRUCTURE_4
+DATA_STRUCTURE_7: StopWordManger  := user defined class 
+DATA_STRUCTURE_8: QueryList       := user defined class , Contains list of DATA_STRUCTURE_9
+DATA_STRUCTURE_9: Query           := user defined class 
 
 parseing and indexing
  - Done with the use of functions:
@@ -22,11 +26,8 @@ parseing and indexing
             
      line_process(line, stopwords),  processes every word in a line
        
-Input Output
-- Prompt(dict_terms,dict_docs): called After the terms and documents have already been indexed, type (quit or QUIT) to stop
-
 To run
-- Download the entire zip file and open in Spyder and simply press play button.If you have any problems running please feel 
+- Download the entire zip file and open in Spyder and simply press play button. If you have any problems running please feel 
 free to email me at bmcca009@ucr.edu
 
 References: https://stackabuse.com/read-a-file-line-by-line-in-python/
