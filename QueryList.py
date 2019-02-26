@@ -58,14 +58,21 @@ class Query:
   #  Document space is built on the same vector space as the query
     def setdocScores(self,fname,dict_terms,dict_docs):
      doc_space=[] # document space
+     index=0
      for word in self.dict_querywords: # check every word in the query
        if word in dict_terms:     # if word is a dictionary word
           curterm = dict_terms[word] # get term from dictionary
           if curterm.existposting(fname): # check if file has term from the postings in the term
-           doc_space.append(curterm.get_IDF_TF(fname,dict_docs)) # add wieghting to document space
+            #use the idf for the wuery of the document
+            idf = curterm.get_Doc_idf(fname,dict_docs)
+            self.tfwieghts[index]=idf * self.tfwieghts[index]
+            index += 1
+            doc_space.append(curterm.get_IDF_TF(fname,dict_docs)) # add wieghting to document space
           else:
+            index+=1
             doc_space.append(0) # add wieght of 0 if term is not in doc
        else:
+           
             doc_space.append(0) # add wieght of 0 if term is not in dict aka not in postings
      self.docScores[fname]= self.cosineSimilarity(doc_space)
 
@@ -97,7 +104,8 @@ class Query:
             rank=str(tups[0])
             docno=str(tups[1])
             score=str(tups[2])
-            file.writelines(querynumber +' Q0 ' + docno +' ' + rank +' '+ score + ' Exp ' + "\n")
+            if score != '0.0':
+                file.writelines(querynumber +' Q0 ' + docno +' ' + rank +' '+ score + ' Exp ' + "\n")
         file.close()
       
 

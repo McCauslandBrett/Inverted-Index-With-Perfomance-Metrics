@@ -68,7 +68,6 @@ def driverInvertedobject():
    
    #load data
    Invertobj = InvertedIndex("data/ap89_collection.html",stopwords.list_stopwords)
-   print(Invertobj.dict_docs)
    
    #load QuerysList
    Qlist= QueryList("querys/query_list.txt",stopwords.list_stopwords,'results_file')
