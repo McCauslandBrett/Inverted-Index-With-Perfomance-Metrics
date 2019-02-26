@@ -26,9 +26,6 @@ parseing and indexing
             
      line_process(line, stopwords),  processes every word in a line
        
-Input Output
-- Prompt(dict_terms,dict_docs): called After the terms and documents have already been indexed, type (quit or QUIT) to stop
-
 To run
 - Download the entire zip file and open in Spyder and simply press play button. If you have any problems running please feel 
 free to email me at bmcca009@ucr.edu
