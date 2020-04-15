@@ -1,4 +1,4 @@
-# Inverted Index Querying 
+# Custom Inverted Index w Querying and Performance Evaluation
 
 Design:
 DATA_STRUCTURE_1: term        := user defined class that contains DATA_STRUCTURE_2: postings and number of documents its in <br/>
