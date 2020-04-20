@@ -27,8 +27,7 @@ parseing and indexing <br/>
      line_process(line, stopwords),  processes every word in a line <br/>
        
 To run <br/>
-- Download the entire zip file and open in Spyder and simply press play button. If you have any problems running please feel 
-free to email me at bmcca009@ucr.edu <br/>
+- Download the entire zip file and open in Spyder and simply press play button. 
 
 References: https://stackabuse.com/read-a-file-line-by-line-in-python/
 
